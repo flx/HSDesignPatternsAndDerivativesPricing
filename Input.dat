@@ -1,0 +1,14 @@
+Option {
+  Expiry: 1.0
+  Payoff: Call at 50.0
+}
+
+Fixing {
+  Spot: 45.0
+  Vol: 0.1
+  Rate: 0.1
+}
+
+Params {
+  Paths: 1000000
+}
