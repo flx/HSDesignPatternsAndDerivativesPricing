@@ -18,7 +18,7 @@
 
 Derivatives pricing code should be correct and execute fast. Mainly because of the latter it is often connected to writing it in C++. This choice can be criticised: C++ is hard to write and difficult to debug (compared to other languages), which requires a lot of effort to ensure that the first goal -- correctness -- is reached. This energy can be better spent.
 
-In the following text which traces a popular book for derivatives pricing in C++, I am trying to show that by choosing Haskell as the programming language the complexity of derivatives pricing code can be vastly decreased - which is certainly a big factor in the production price of the libraries. Haskell has the reputation of being not a big factor off in terms of execution speed. This will not be benchmarked here.
+In the following text which traces a popular book for derivatives pricing in C++ (C++ Design Patterns and Derivatives Pricing by Mark S. Joshi), I am trying to show that by choosing Haskell as the programming language the complexity of derivatives pricing code can be vastly decreased - which is certainly a big factor in the production price of the libraries. Haskell has the reputation of being not a big factor off in terms of execution speed. This will not be benchmarked here.
 
 \section{Haskell}
 
