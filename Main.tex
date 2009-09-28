@@ -1,0 +1,2117 @@
+\documentclass{scrartcl}
+
+\let\origlinebreak=\\
+\renewcommand{\sectfont}{\bf}
+\long\def\ignore#1{}
+\usepackage[english]{babel}
+\usepackage{hyperref}
+\usepackage{mathpazo}
+\usepackage{colortbl}
+\usepackage{calc}
+\usepackage{paralist}
+\usepackage{ifthen}
+\usepackage{relsize}
+\usepackage{xspace}
+\usepackage{tabularx}
+\newcommand*{\PDF}{{\smaller{PDF}}\xspace}
+\newcommand*{\CTAN}{{\smaller{CTAN}}\xspace}
+\setdefaultitem{\textbf{--}}{}{}{}
+\let\defined\textbf
+%% ODER: format ==         = "\mathrel{==}"
+%% ODER: format /=         = "\neq "
+%
+%
+\makeatletter
+\@ifundefined{lhs2tex.lhs2tex.sty.read}%
+  {\@namedef{lhs2tex.lhs2tex.sty.read}{}%
+   \newcommand\SkipToFmtEnd{}%
+   \newcommand\EndFmtInput{}%
+   \long\def\SkipToFmtEnd#1\EndFmtInput{}%
+  }\SkipToFmtEnd
+
+\newcommand\ReadOnlyOnce[1]{\@ifundefined{#1}{\@namedef{#1}{}}\SkipToFmtEnd}
+\usepackage{amstext}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
+\DeclareFontFamily{OT1}{cmtex}{}
+\DeclareFontShape{OT1}{cmtex}{m}{n}
+  {<5><6><7><8>cmtex8
+   <9>cmtex9
+   <10><10.95><12><14.4><17.28><20.74><24.88>cmtex10}{}
+\DeclareFontShape{OT1}{cmtex}{m}{it}
+  {<-> ssub * cmtt/m/it}{}
+\newcommand{\texfamily}{\fontfamily{cmtex}\selectfont}
+\DeclareFontShape{OT1}{cmtt}{bx}{n}
+  {<5><6><7><8>cmtt8
+   <9>cmbtt9
+   <10><10.95><12><14.4><17.28><20.74><24.88>cmbtt10}{}
+\DeclareFontShape{OT1}{cmtex}{bx}{n}
+  {<-> ssub * cmtt/bx/n}{}
+\newcommand{\tex}[1]{\text{\texfamily#1}}	% NEU
+
+\newcommand{\Sp}{\hskip.33334em\relax}
+
+
+\newcommand{\Conid}[1]{\mathit{#1}}
+\newcommand{\Varid}[1]{\mathit{#1}}
+\newcommand{\anonymous}{\kern0.06em \vbox{\hrule\@width.5em}}
+\newcommand{\plus}{\mathbin{+\!\!\!+}}
+\newcommand{\bind}{\mathbin{>\!\!\!>\mkern-6.7mu=}}
+\newcommand{\rbind}{\mathbin{=\mkern-6.7mu<\!\!\!<}}% suggested by Neil Mitchell
+\newcommand{\sequ}{\mathbin{>\!\!\!>}}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\geq}{\geqslant}
+\usepackage{polytable}
+
+%mathindent has to be defined
+\@ifundefined{mathindent}%
+  {\newdimen\mathindent\mathindent\leftmargini}%
+  {}%
+
+\def\resethooks{%
+  \global\let\SaveRestoreHook\empty
+  \global\let\ColumnHook\empty}
+\newcommand*{\savecolumns}[1][default]%
+  {\g@addto@macro\SaveRestoreHook{\savecolumns[#1]}}
+\newcommand*{\restorecolumns}[1][default]%
+  {\g@addto@macro\SaveRestoreHook{\restorecolumns[#1]}}
+\newcommand*{\aligncolumn}[2]%
+  {\g@addto@macro\ColumnHook{\column{#1}{#2}}}
+
+\resethooks
+
+\newcommand{\onelinecommentchars}{\quad-{}- }
+\newcommand{\commentbeginchars}{\enskip\{-}
+\newcommand{\commentendchars}{-\}\enskip}
+
+\newcommand{\visiblecomments}{%
+  \let\onelinecomment=\onelinecommentchars
+  \let\commentbegin=\commentbeginchars
+  \let\commentend=\commentendchars}
+
+\newcommand{\invisiblecomments}{%
+  \let\onelinecomment=\empty
+  \let\commentbegin=\empty
+  \let\commentend=\empty}
+
+\visiblecomments
+
+\newlength{\blanklineskip}
+\setlength{\blanklineskip}{0.66084ex}
+
+\newcommand{\hsindent}[1]{\quad}% default is fixed indentation
+\let\hspre\empty
+\let\hspost\empty
+\newcommand{\NB}{\textbf{NB}}
+\newcommand{\Todo}[1]{$\langle$\textbf{To do:}~#1$\rangle$}
+
+\EndFmtInput
+\makeatother
+%
+\newlength{\lwidth}
+\newlength{\cwidth}
+\setlength{\lwidth}{0pt}
+\setlength{\cwidth}{0pt}
+\let\origcolor=\color
+\newcommand{\dep}[1]{{\origcolor{red}#1}}
+\def\swgt#1{\switch[\value{step}>#1]}%
+\def\ro#1{\ifthenelse{\value{step}=#1}{\origcolor{red}}{}}%
+%hyperref needs some setup, especially after pdfscreen
+\hypersetup{%
+  colorlinks=True,%
+  pdfmenubar=True,%
+  pdfcenterwindow=False,% 
+  pdffitwindow=False}%
+\newcounter{pagesave}
+% This one is with color:
+\definecolor{rlcolor}{gray}{.8}
+\arrayrulecolor{rlcolor}
+\definecolor{hcolor}{gray}{.7}
+\newenvironment{colorcode}{%
+  \colorsurround
+  \(%
+  \pboxed\SaveRestoreHook}{%
+  \ColumnHook\endpboxed
+  \)%
+  \endcolorsurround}
+\newenvironment{colorsurround}{\colorverb}{\endcolorverb}
+\newenvironment{colorarray}{%
+  \colorsurround
+  \(%
+  \array}{%
+  \endarray
+  \)%
+  \endcolorsurround}
+\makeatletter
+\newenvironment{colorverb}{%
+  \parskip=\abovedisplayskip\par\noindent
+  \begingroup\small% small changes displayskips!
+  \tabular{@{}|p{\linewidth-2\arraycolsep-2\arrayrulewidth-2pt}|@{}}%
+  \hline \\[-1.5ex]
+  \let\myendofline=\\
+  \let\\=\origlinebreak}{%
+  \myendofline[.5ex]\hline
+  \endtabular
+  \endgroup
+  \parskip=\belowdisplayskip\par\noindent
+  \ignorespacesafterend}
+\makeatother
+\newenvironment{important}[1][Important]%
+  {\colorsurround
+   \centering
+   \bfseries\textsc{#1:}\ }%
+  {\endcolorsurround}
+
+%\definecolor{codecolor}{rgb}{.982, .902, .902}% original
+%\definecolor{codecolor}{rgb}{1,.898,.667}% so'n orange
+\definecolor{codecolor}{rgb}{1,1,.667}
+% ***********************************************************************************************************
+
+\parskip 2ex
+\parindent 0pt	
+ 
+\title{Design Patterns in Haskell \\ and Derivatives Pricing}
+\author{Felix Matschke}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\clearpage
+
+\section{Preamble}
+
+Derivatives pricing code should be correct and execute fast. Mainly because of the latter it is often connected to writing it in C++. This choice can be criticised: C++ is hard to write and difficult to debug (compared to other languages), which requires a lot of effort to ensure that the first goal -- correctness -- is reached. This energy can be better spent.
+
+In the following text which traces a popular book for derivatives pricing in C++ (``C++ Design Patterns and Derivatives Pricing'' by Mark S. Joshi), I am trying to show that by choosing Haskell as the programming language the complexity of derivatives pricing code can be vastly decreased - which is certainly a big factor in the production price of the libraries. Haskell has the reputation of being not a big factor off in terms of execution speed. This will not be benchmarked here.
+
+\section{Haskell}
+
+Everyone should learn Haskell.
+
+Haskell looks different on the first look and on the second look. It has a number of concepts and operators that are unusual. The book ``Real World Haskell'' (by Bryan O'Sullivan, Don Stewart, and John Goerzen) is a good introduction. Concepts that seem relevant will be briefly introduced, but this is not intended to stand alone as any kind of reference.
+
+\section{A Simple Monte Carlo Model}
+\subsection{The Theory}
+Below the commonly known formulas describing stock price evolution and Black-Scholes pricing theory. Given the stock price evolution described by:
+\begin{equation}
+  dS_t = \mu S_t dt + \sigma S_t dW_t
+\end{equation}
+and the final payoff function $f$, the present value of a derivative is
+\begin{equation}
+  e^{-rT}\mathbb{E}(f(S_t))
+\end{equation}
+if the expectation is calculated under the risk free process
+\begin{equation}
+  dS_t = r S_t dt + \sigma S_t dW_t
+\end{equation}
+
+Following some derivations the price of a vanilla option with terminal payoff $f$ can be written as:
+
+\begin{equation}
+  e^{-rT}\mathbb{E}(f(S_0 e^{(r - \frac{1}{2}\sigma^2)T + \sigma \sqrt{T} N(0,1)}))
+\end{equation}
+
+So a simple algorithm for a Monte Carlo pricer is to draw $n$ gaussian variables $x$ with a distribution $N(0,1)$ and compute the average of
+
+\[f(S_0 e^{(r - \frac{1}{2}\sigma^2)T + \sigma \sqrt{T} x})\]
+
+\subsection{A simple Implementation of a Monte Carlo call option pricer}
+
+We need GSL to get the random number generators and Control.Monad for some monadic operations:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Data}.List}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{GSL}.\Conid{Random}.Gen}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{GSL}.\Conid{Random}.Dist}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Control}.Monad}{}\<[E]%
+\end{colorcode}\resethooks
+
+This contains our simple Monte Carlo calculator:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{23}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{simpleMC1}\mathbin{::}\Conid{Double}\to \Conid{Double}\to \Conid{Double}\to \Conid{Double}\to \Conid{Double}\to [\mskip1.5mu \Conid{Double}\mskip1.5mu]\to \Conid{Double}{}\<[E]%
+\\
+\>[B]{}\Varid{simpleMC1}\;\Varid{expiry}\;\Varid{strike}\;\Varid{spot}\;\Varid{vol}\;\Varid{r}\;\Varid{sample}\mathrel{=}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{exp}\;((\mathbin{-}\Varid{r})\mathbin{*}\Varid{expiry})\mathbin{*}\Varid{sumAll}\mathbin{/}\Varid{n}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{where}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{variance}{}\<[23]%
+\>[23]{}\mathrel{=}\Varid{vol}\mathbin{*}\Varid{vol}\mathbin{*}\Varid{expiry}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{rootVariance}{}\<[23]%
+\>[23]{}\mathrel{=}\Varid{sqrt}\;\Varid{variance}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{itoCorr}{}\<[23]%
+\>[23]{}\mathrel{=}(\mathbin{-}\mathrm{0.5})\mathbin{*}\Varid{variance}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{mSpot}{}\<[23]%
+\>[23]{}\mathrel{=}\Varid{spot}\mathbin{*}\Varid{exp}\;(\Varid{r}\mathbin{*}\Varid{expiry}\mathbin{+}\Varid{itoCorr}){}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{sumAll}{}\<[23]%
+\>[23]{}\mathrel{=}\Varid{foldl'}\;(\mathbin{+})\;\mathrm{0}\mathbin{\$}\Varid{map}\;\Varid{sumItem}\;\Varid{sample}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{n}{}\<[23]%
+\>[23]{}\mathrel{=}(\Varid{fromIntegral}\mathbin{\$}\Varid{length}\;\Varid{sample}){}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{sumItem}\;\Varid{gaussian}{}\<[23]%
+\>[23]{}\mathrel{=}\mathbf{if}\;\Varid{payoff}\mathbin{>}\mathrm{0}\;\mathbf{then}\;\Varid{payoff}\;\mathbf{else}\;\mathrm{0}{}\<[E]%
+\\
+\>[5]{}\hsindent{2}{}\<[7]%
+\>[7]{}\mathbf{where}\;\Varid{payoff}\mathrel{=}(\mathbin{-}\Varid{strike})\mathbin{+}\Varid{mSpot}\mathbin{*}\Varid{exp}\;(\Varid{rootVariance}\mathbin{*}\Varid{gaussian}){}\<[E]%
+\end{colorcode}\resethooks
+
+Factoring out the questions for input values significantly shortens the main body:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{askForInput}\;\Varid{statement}\mathrel{=}\Varid{putStrLn}\;\Varid{statement}\sequ (\Varid{liftM}\;\Varid{read}\mathbin{\$}\Varid{getLine}){}\<[E]%
+\end{colorcode}\resethooks
+
+Main function doing the input and output:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{15}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{main}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{expiry}{}\<[15]%
+\>[15]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~Expiry\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{strike}{}\<[15]%
+\>[15]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~strike\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{spot}{}\<[15]%
+\>[15]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~spot\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{vol}{}\<[15]%
+\>[15]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~vol\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{r}{}\<[15]%
+\>[15]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~r\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{n}{}\<[15]%
+\>[15]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~number~of~paths\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{rng}{}\<[15]%
+\>[15]{}\leftarrow \Varid{newRNG}\;\Varid{mt19937}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{randomNums}{}\<[15]%
+\>[15]{}\leftarrow \Varid{replicateM}\;\Varid{n}\mathbin{\$}\Varid{getGaussian}\;\Varid{rng}\;\mathrm{1.0}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{putStrLn}\mathbin{\$}\Varid{show}\mathbin{\$}\Varid{simpleMC1}\;\Varid{expiry}\;\Varid{strike}\;\Varid{spot}\;\Varid{vol}\;\Varid{r}\;\Varid{randomNums}{}\<[E]%
+\end{colorcode}\resethooks
+
+\subsection{Concepts introduced}
+
+\begin{description}
+\item[Pure Functions] Our pricer function \text{\tt simpleMC1} is a pure function -- no state is generated or read outside the parameters passed on, including the random draws passed over in the parameter \text{\tt sample}. This has the advantage that the function will never return a different value if given the same parameters - something valuable to know, especially if correctness is a concern.
+\item[Left Fold] General for and while loops are not commonly used (even if they can be replicated to some extent) - but are mostly replaced by recursion or iterations over lists. The left fold used here (\text{\tt foldl\char39{}}) is the strict version of a left fold of the type
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{foldl}\mathbin{::}(\Varid{a}\to \Varid{b}\to \Varid{a})\to \Varid{a}\to [\mskip1.5mu \Varid{b}\mskip1.5mu]\to \Varid{a}{}\<[E]%
+\end{colorcode}\resethooks
+As parameters it takes a function with two parameters (one of type \text{\tt a}, the second of type \text{\tt b}, returning a value of type \text{\tt a})
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{f}\mathbin{::}\Varid{a}\to \Varid{b}\to \Varid{a}{}\<[E]%
+\end{colorcode}\resethooks
+and two more values $x$ of type \text{\tt a} and a list of values $y_i$ -- all of type \text{\tt b} denoted as \text{\tt \char91{}b\char93{}} -- and computes the value of $f(f(f(x, y_0), y_1), y_2) \dots$
+The strictness of \text{\tt foldl\char39{}} avoids that the lazy evaluation of Haskell (which is often advantageous) makes our function stack up unevaluated nested functions calls until -- right at the end of the program -- we want to print the value on screen and all calls are evaluated. Haskell uses lazy evaluation where ever it can, except if told otherwise -- like here.
+\item[map] The function \text{\tt map} is central to the use of the ubiquitous lists in functional languages. It is a function of type 
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{map}\mathbin{::}(\Varid{a}\to \Varid{b})\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{b}\mskip1.5mu]{}\<[E]%
+\end{colorcode}\resethooks
+that - given a function $f$ with one parameter (of type \text{\tt a} and returning a value of type \text{\tt b}) and a list of values $x_i$ of type \text{\tt a} returns the new list \[ [f(x_0), f(x_1), \dots] \]
+\item[The main function and the IO monad] Without going into details about monads (a concept to be introduced later) - the main function needs to read and write state, otherwise nothing useful can be achieved. The following points are useful to understand the above code:
+\begin{itemize}
+\item Everything in the IO Monad is achieved by chaining ``actions'' together in the \text{\tt do} construct. 
+\item In a \text{\tt do} construct, the return values of pure functions are retrieved with \text{\tt let}: \begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{let}\;\Varid{result}\mathrel{=}\Varid{function}\;\Varid{a}\;\Varid{b}\;\Varid{c}{}\<[E]%
+\end{colorcode}\resethooks
+\item In a \text{\tt do} construct, values retrieved from actions that are to be used in pure functions are extracted from their monad with \text{\tt \char60{}\char45{}}: \begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{result}\leftarrow \Varid{action}{}\<[E]%
+\end{colorcode}\resethooks
+ The following code:
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{b}\leftarrow \Varid{liftM}\;\Varid{read}\mathbin{\$}\Varid{getLine}{}\<[E]%
+\end{colorcode}\resethooks
+is equivalent to:
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{a}\leftarrow \Varid{getLine}{}\<[E]%
+\\
+\>[B]{}\mathbf{let}\;\Varid{b}\mathrel{=}\Varid{read}\;\Varid{a}{}\<[E]%
+\end{colorcode}\resethooks
+\item Pure functions like \text{\tt read} (transforming a string it into values of - say - type \text{\tt Int} or \text{\tt Double}) need to be ``lifted'' into the monad with \text{\tt liftM} if used directly on the output of actions. 
+\item If not using \text{\tt do}, actions (like \text{\tt putStrLn}, printing a line on the screen) can be chained to the next action with \text{\tt \char62{}\char62{}}. 
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{action1}\sequ \Varid{action2}{}\<[E]%
+\end{colorcode}\resethooks
+corresponds to 
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{action1}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{action2}{}\<[E]%
+\end{colorcode}\resethooks
+\end{itemize}
+\item[The operator \text{\tt \char36{}}] To avoid myriads of parantheses (like (in (lisp ()))) one can use the operator \text{\tt \char36{}}. It makes it possible to write:
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{function}\;\Varid{a1}\mathbin{\$}\Varid{function2}\;\Varid{b}\mathbin{\$}\Varid{function3}\;\Varid{c}{}\<[E]%
+\end{colorcode}\resethooks
+instead of
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{function}\;\Varid{a1}\;(\Varid{function2}\;\Varid{b}\;(\Varid{function3}\;\Varid{c})){}\<[E]%
+\end{colorcode}\resethooks
+Other than making the code (arguably) more readable, this is equivalent.
+\end{description}
+
+\subsection{Critiquing the approach}
+
+Several points of critique come to mind:
+
+\begin{itemize}
+\item The call payoff is hard coded - a put would need a new function, as would other payoffs like digitals
+\item Stats like standard error or a convergence tables would need major changes
+\item Sampling is hard coded - this makes it difficult to integrate other types like antithetic sampling
+\item The approach does not allow for an efficient termination condition (iterating until a specific standard error or other arises)
+\item Large samples are not possible and will make the stack overflow (the sample is before being passed on and evaluated in the Monte Carlo function)
+\end{itemize}
+
+Some of these points don't seem too serious: The overall amount of code is small and easy to oversee - one of the major advantages of Haskell. Implementing a different terminal payoff (e.g. for a put) would not need a tremendous amount of code repetition. But it should nevertheless be avoided.
+
+\section{Generalising Payoff and Option Data}
+
+It would be nice to integrate any types of final payoffs - which should not modify our Monte Carlo routine. A data type that contains the information of a specific payoff and for which this payoff can be evaluated without modifying anything else is the solution to the problem.
+
+\subsection{Implementing a Payoff Class}
+
+Haskell is not object oriented but still has classes -- type classes. If a type is an instance of a type class, a specific set of functions are defined for the type (which makes it actually quite similar to object oriented classes where specific methods are defined for an instance of a specific class.) These will be helpful for defining payoffs. When dealing with different payoffs we want to have a function that tells us, based on the given payoff type and associated data like strike, what the payoff in Dollars would be.
+
+\subsection{The Payoff type class}
+
+Define a module Payoff defining the Payoff type class, requiring the definition of one function, namely payoff - which takes the terminal spot value and returns the payoff.
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{module}\;\Conid{Payoff}\;\mathbf{where}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{class}\;\Conid{PayoffClass}\;\Varid{a}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\Varid{payoff}\mathbin{::}\Varid{a}\to \Conid{Double}\to \Conid{Double}{}\<[E]%
+\end{colorcode}\resethooks
+
+Then we define the data type for vanilla calls and puts:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{13}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{data}\;\Conid{VanillaOption}\mathrel{=}\Conid{Put}\mid \Conid{Call}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{deriving}\;(\Conid{Show}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{data}\;\Conid{VOPayoff}\mathrel{=}\Conid{VOPayoff}\;\{\mskip1.5mu {}\<[E]%
+\\
+\>[B]{}\hsindent{13}{}\<[13]%
+\>[13]{}\Varid{ptype}\mathbin{::}\Conid{VanillaOption},{}\<[E]%
+\\
+\>[B]{}\hsindent{13}{}\<[13]%
+\>[13]{}\Varid{strike}\mathbin{::}\Conid{Double}\mskip1.5mu\}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{deriving}\;(\Conid{Show}){}\<[E]%
+\end{colorcode}\resethooks
+
+Now we define the instance of the PayoffClass type class - defining the 2 payoffs of vanilla calls and puts:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{instance}\;\Conid{PayoffClass}\;\Conid{VOPayoff}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{payoff}\;(\Conid{VOPayoff}\;\Conid{Call}\;\Varid{strike})\;\Varid{spot}\mathrel{=}\mathbf{if}\;\Varid{spot}\mathbin{>}\Varid{strike}\;\mathbf{then}\;\Varid{spot}\mathbin{-}\Varid{strike}\;\mathbf{else}\;\mathrm{0}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{payoff}\;(\Conid{VOPayoff}\;\Conid{Put}\;\Varid{strike})\;\Varid{spot}\mathrel{=}\mathbf{if}\;\Varid{spot}\mathbin{<}\Varid{strike}\;\mathbf{then}\;\Varid{strike}\mathbin{-}\Varid{spot}\;\mathbf{else}\;\mathrm{0}{}\<[E]%
+\end{colorcode}\resethooks
+
+\subsection{Using the Payoff Class}
+
+We need to include our new module as well:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{import}\;\Conid{\Conid{GSL}.\Conid{Random}.Gen}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{GSL}.\Conid{Random}.Dist}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Control}.Monad}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Payoff}{}\<[E]%
+\end{colorcode}\resethooks
+
+Our simple Monte Carlo calculator changes to:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{23}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{simpleMC2}\mathbin{::}\Conid{PayoffClass}\;\Varid{a}\Rightarrow \Varid{a}\to \Conid{Double}\to \Conid{Double}\to \Conid{Double}\to \Conid{Double}\to [\mskip1.5mu \Conid{Double}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\to \Conid{Double}{}\<[E]%
+\\
+\>[B]{}\Varid{simpleMC2}\;\Varid{po}\;\Varid{expiry}\;\Varid{spot}\;\Varid{vol}\;\Varid{r}\;\Varid{sample}\mathrel{=}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{exp}\;((\mathbin{-}\Varid{r})\mathbin{*}\Varid{expiry})\mathbin{*}\Varid{sumAll}\mathbin{/}\Varid{n}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{where}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{variance}{}\<[23]%
+\>[23]{}\mathrel{=}\Varid{vol}\mathbin{*}\Varid{vol}\mathbin{*}\Varid{expiry}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{rootVariance}{}\<[23]%
+\>[23]{}\mathrel{=}\Varid{sqrt}\;\Varid{variance}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{itoCorr}{}\<[23]%
+\>[23]{}\mathrel{=}(\mathbin{-}\mathrm{0.5})\mathbin{*}\Varid{variance}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{mSpot}{}\<[23]%
+\>[23]{}\mathrel{=}\Varid{spot}\mathbin{*}\Varid{exp}\;(\Varid{r}\mathbin{*}\Varid{expiry}\mathbin{+}\Varid{itoCorr}){}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{sumAll}{}\<[23]%
+\>[23]{}\mathrel{=}\Varid{sum}\mathbin{\$}\Varid{map}\;\Varid{sumItem}\;\Varid{sample}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{n}{}\<[23]%
+\>[23]{}\mathrel{=}(\Varid{fromIntegral}\mathbin{\$}\Varid{length}\;\Varid{sample}){}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{sumItem}\;\Varid{gaussian}{}\<[23]%
+\>[23]{}\mathrel{=}\Varid{payoff}\;\Varid{po}\;\Varid{randomSpot}{}\<[E]%
+\\
+\>[5]{}\hsindent{2}{}\<[7]%
+\>[7]{}\mathbf{where}\;\Varid{randomSpot}\mathrel{=}\Varid{mSpot}\mathbin{*}\Varid{exp}\;(\Varid{rootVariance}\mathbin{*}\Varid{gaussian}){}\<[E]%
+\end{colorcode}\resethooks
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{askForInput}\;\Varid{statement}\mathrel{=}\Varid{putStrLn}\;\Varid{statement}\sequ (\Varid{liftM}\;\Varid{read}\mathbin{\$}\Varid{getLine}){}\<[E]%
+\end{colorcode}\resethooks
+
+Main function doing the input and output:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{10}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{11}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{main}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{temp}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~option~type~(1~=~Call,~other~=~Put)\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{expiry}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~Expiry\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{strike}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~strike\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{spot}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~spot\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{vol}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~vol\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{r}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~r\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{n}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~number~of~paths\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;\Varid{payoff}\mathrel{=}\mathbf{if}\;\Varid{temp}\equiv \mathrm{1}\;\mathbf{then}\;\Conid{VOPayoff}\;\Conid{Call}\;\Varid{strike}\;\mathbf{else}\;\Conid{VOPayoff}\;\Conid{Put}\;\Varid{strike}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{rng}{}\<[10]%
+\>[10]{}\leftarrow \Varid{newRNG}\;\Varid{mt19937}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{randomNums}\leftarrow \Varid{replicateM}\;\Varid{n}\mathbin{\$}\Varid{getGaussian}\;\Varid{rng}\;\mathrm{1.0}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{putStrLn}\mathbin{\$}\Varid{show}\mathbin{\$}\Varid{simpleMC2}\;\Varid{payoff}\;\Varid{expiry}\;\Varid{spot}\;\Varid{vol}\;\Varid{r}\;\Varid{randomNums}{}\<[E]%
+\end{colorcode}\resethooks
+
+\subsection{Implementing an Option Class}
+
+It would be nice to bundle all the information that we have about the option to be priced in one data container - the expiry of the option is still sitting outside. We can easily define a record type data type that will help us over this:
+
+\subsection{The Option type class}
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{module}\;\Conid{Option}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Payoff}{}\<[E]%
+\end{colorcode}\resethooks
+
+The Option data type can accommodate any payoff defined in a PayoffClass type class:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{11}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{11E}{@{}l@{}}%
+\column{13}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{data}\;\Conid{Option}\;\Varid{a}\mathrel{=}\Conid{Option}\;\{\mskip1.5mu {}\<[E]%
+\\
+\>[B]{}\hsindent{13}{}\<[13]%
+\>[13]{}\Varid{expiry}\mathbin{::}\Conid{Double},{}\<[E]%
+\\
+\>[B]{}\hsindent{13}{}\<[13]%
+\>[13]{}\Varid{pay}\mathbin{::}\Varid{a}{}\<[E]%
+\\
+\>[B]{}\hsindent{11}{}\<[11]%
+\>[11]{}\mskip1.5mu\}{}\<[11E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{deriving}\;(\Conid{Show}){}\<[E]%
+\end{colorcode}\resethooks
+
+One might be tempted to put a type restriction to PayoffClass on the type a - which is not necessary and would force all future functions to have this type restriction as well. As soon as we use the type a in a context where this needs to be a payoff, the type will be inferred there.
+
+\subsection{Using the Option Class}
+
+We need to include our new module as well:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{import}\;\Conid{\Conid{GSL}.\Conid{Random}.Gen}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{GSL}.\Conid{Random}.Dist}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Control}.Monad}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Payoff}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Option}{}\<[E]%
+\end{colorcode}\resethooks
+
+Our simple Monte Carlo calculator changes to:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{23}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{simpleMC3}\mathbin{::}\Conid{PayoffClass}\;\Varid{a}\Rightarrow (\Conid{Option}\;\Varid{a})\to \Conid{Double}\to \Conid{Double}\to \Conid{Double}\to [\mskip1.5mu \Conid{Double}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\to \Conid{Double}{}\<[E]%
+\\
+\>[B]{}\Varid{simpleMC3}\;\Varid{op}\;\Varid{spot}\;\Varid{vol}\;\Varid{r}\;\Varid{sample}\mathrel{=}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{exp}\;((\mathbin{-}\Varid{r})\mathbin{*}(\Varid{expiry}\;\Varid{op}))\mathbin{*}\Varid{sumAll}\mathbin{/}\Varid{n}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{where}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{variance}{}\<[23]%
+\>[23]{}\mathrel{=}\Varid{vol}\mathbin{*}\Varid{vol}\mathbin{*}(\Varid{expiry}\;\Varid{op}){}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{rootVariance}{}\<[23]%
+\>[23]{}\mathrel{=}\Varid{sqrt}\;\Varid{variance}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{itoCorr}{}\<[23]%
+\>[23]{}\mathrel{=}(\mathbin{-}\mathrm{0.5})\mathbin{*}\Varid{variance}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{mSpot}{}\<[23]%
+\>[23]{}\mathrel{=}\Varid{spot}\mathbin{*}\Varid{exp}\;(\Varid{r}\mathbin{*}(\Varid{expiry}\;\Varid{op})\mathbin{+}\Varid{itoCorr}){}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{sumAll}{}\<[23]%
+\>[23]{}\mathrel{=}\Varid{sum}\mathbin{\$}\Varid{map}\;\Varid{sumItem}\;\Varid{sample}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{n}{}\<[23]%
+\>[23]{}\mathrel{=}(\Varid{fromIntegral}\mathbin{\$}\Varid{length}\;\Varid{sample}){}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{sumItem}\;\Varid{gaussian}{}\<[23]%
+\>[23]{}\mathrel{=}\Varid{payoff}\;(\Varid{pay}\;\Varid{op})\;\Varid{randomSpot}{}\<[E]%
+\\
+\>[5]{}\hsindent{2}{}\<[7]%
+\>[7]{}\mathbf{where}\;\Varid{randomSpot}\mathrel{=}\Varid{mSpot}\mathbin{*}\Varid{exp}\;(\Varid{rootVariance}\mathbin{*}\Varid{gaussian}){}\<[E]%
+\end{colorcode}\resethooks
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{askForInput}\;\Varid{statement}\mathrel{=}\Varid{putStrLn}\;\Varid{statement}\sequ (\Varid{liftM}\;\Varid{read}\mathbin{\$}\Varid{getLine}){}\<[E]%
+\end{colorcode}\resethooks
+
+Main function doing the input and output:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{11}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{16}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{main}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{temp}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~option~type~(1~=~Call,~other~=~Put)\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{expiry}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~Expiry\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{strike}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~strike\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{spot}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~spot\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{vol}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~vol\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{r}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~r\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{n}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~number~of~paths\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;\Varid{option}\mathrel{=}\mathbf{if}\;\Varid{temp}\equiv \mathrm{1}{}\<[E]%
+\\
+\>[3]{}\hsindent{13}{}\<[16]%
+\>[16]{}\mathbf{then}\;\Conid{Option}\;\Varid{expiry}\;(\Conid{VOPayoff}\;\Conid{Call}\;\Varid{strike}){}\<[E]%
+\\
+\>[3]{}\hsindent{13}{}\<[16]%
+\>[16]{}\mathbf{else}\;\Conid{Option}\;\Varid{expiry}\;(\Conid{VOPayoff}\;\Conid{Put}\;\Varid{strike}){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{rng}{}\<[11]%
+\>[11]{}\leftarrow \Varid{newRNG}\;\Varid{mt19937}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{randomNums}\leftarrow \Varid{replicateM}\;\Varid{n}\mathbin{\$}\Varid{getGaussian}\;\Varid{rng}\;\mathrm{1.0}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{putStrLn}\mathbin{\$}\Varid{show}\mathbin{\$}\Varid{simpleMC3}\;\Varid{option}\;\Varid{spot}\;\Varid{vol}\;\Varid{r}\;\Varid{randomNums}{}\<[E]%
+\end{colorcode}\resethooks
+
+\subsection{Concepts introduced}
+
+\begin{description}
+\item[Defining new data types] There are 2 different ways to define a new data type: \text{\tt type} and \text{\tt data}. 
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{type}\;\Conid{Foo1}\mathrel{=}(\Conid{Int},\Conid{Int}){}\<[E]%
+\end{colorcode}\resethooks
+\text{\tt type} declares a type synonym. This makes it easier to define the type signatures or constraints.
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{data}\;\Conid{Foo2}\mathrel{=}\Conid{Foo2}\;\Conid{Int}\;\Conid{Int}{}\<[E]%
+\end{colorcode}\resethooks
+\text{\tt data} declares a new type via a type constructor - in this case a type that contains two integers. There is a record style syntax for \text{\tt data}:
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{data}\;\Conid{Foo3}\mathrel{=}\Conid{Foo3}\;\{\mskip1.5mu \Varid{one}\mathbin{::}\Conid{Int},\Varid{two}\mathbin{::}\Conid{Int}\mskip1.5mu\}{}\<[E]%
+\end{colorcode}\resethooks
+which creates the same data constructor function Foo3 of the type
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Conid{Foo3}\mathbin{::}\Conid{Int}\to \Conid{Int}\to \Conid{Foo3}{}\<[E]%
+\end{colorcode}\resethooks
+but also the two functions
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{one}\mathbin{::}\Conid{Foo3}\to \Conid{Int}{}\<[E]%
+\\
+\>[B]{}\Varid{tow}\mathbin{::}\Conid{Foo3}\to \Conid{Int}{}\<[E]%
+\end{colorcode}\resethooks
+which do what you would expect them two: extract the two different integers from Foo3. We could define these ourselves for \text{\tt Foo2}:
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{one}\;(\Conid{Foo2}\;\Varid{a}\;\anonymous )\mathrel{=}\Varid{a}{}\<[E]%
+\\
+\>[B]{}\Varid{two}\;(\Conid{Foo2}\;\anonymous \;\Varid{a})\mathrel{=}\Varid{a}{}\<[E]%
+\end{colorcode}\resethooks
+This is eventually what the record syntax does for us.
+\item[Type Classes] Haskell is a strongly typed language - which helps in the way that errors can often be spotted at compile time vs. runtime. It also makes type inference possible: As seen in the code so far, we don't have to specify types very often but only in ambiguous situations. Sometimes we might choose to write the type signature to help the readability of the code -- this is done here for all \text{\tt SimpleMC} functions.
+\end{description}
+
+\section{Monadic Random Number Generation}
+
+Pure functions in Haskell can only receive data through the parameters and give back results as the result of the function -- they are purposefully not made to read or write any other parts of the memory and cannot call functions that do so.
+
+If we would for example want to implement a simple counter function to which we want to pass an increment and get back the new global count we have no choice other than storing the state outside the function and passing it on -- and to receive it back. It cannot be done via a global variable -- the global variable would be state outside the function that would be accessed.
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{increment}\;(\Varid{dx},\Varid{state})\mathrel{=}(\Varid{state}\mathbin{+}\Varid{dx},\Varid{state}\mathbin{+}\Varid{dx}){}\<[E]%
+\end{colorcode}\resethooks
+
+If we want to do this a number of times this looks like the following:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{main}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;\Varid{state0}\mathrel{=}\mathrm{0}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;(\Varid{c1},\Varid{state1})\mathrel{=}\Varid{increment}\;(\mathrm{10},\Varid{state0}){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{putStrLn}\mathbin{\$}\Varid{show}\;\Varid{c1}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;(\Varid{c2},\Varid{state2})\mathrel{=}\Varid{increment}\;(\mathrm{11},\Varid{state1}){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{putStrLn}\mathbin{\$}\Varid{show}\;\Varid{c2}{}\<[E]%
+\end{colorcode}\resethooks
+
+This passing on of the state from one ``action'' to another is implemented in the Monad typeclass: A monad of type ``M a'' stands for a chain of actions that results in the type \text{\tt a} if the monad gets evaluated. Now we need the possibilities to ``lift'' values into the monad, and to chain actions together:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{return}\mathbin{::}(\Conid{Monad}\;\Varid{m})\Rightarrow \Varid{a}\to \Varid{m}\;\Varid{a}{}\<[E]%
+\\
+\>[B]{}(\sequ )\mathbin{::}(\Conid{Monad}\;\Varid{m})\Rightarrow \Varid{m}\;\Varid{a}\to \Varid{m}\;\Varid{b}\to \Varid{m}\;\Varid{b}{}\<[E]%
+\\
+\>[B]{}(\bind )\mathbin{::}(\Conid{Monad}\;\Varid{m})\Rightarrow \Varid{m}\;\Varid{a}\to (\Varid{a}\to \Varid{m}\;\Varid{b})\to \Varid{m}\;\Varid{b}{}\<[E]%
+\end{colorcode}\resethooks
+
+\begin{description}
+\item[\text{\tt return}] is an action that takes a pure functional value and returns the monad that (if evaluated) gives this value back.
+\item[The operator \text{\tt \char62{}\char62{}}] chains two actions together, dismissing the result of the first. When is this useful? In a parser, the first action might be consuming a required chain of characters in the state (the string of unconsumed characters) before the next actual value to be read.
+\item[The operator \text{\tt \char62{}\char62{}\char61{}}] chains two actions together whereby the second action takes a parameter of the same type as the return type of the first action (hidden in the monad).
+\end{description}
+
+Pseudo random number generation is a very good example of state that needs to be carried on. One way of passing on state is the following:
+
+It is possible to elegantly simulate state by creating functions that pass the state on to the next - in a chain of ``actions''. This is implemented in Monads in Haskell - and for random number generation there conveniently is a Monad implementation that wraps a the random number generator from the Gnu Scientific Library.
+
+The following modification of our original code will run with arbitrarily large sample sizes in constant space. Another trick has to be applied to achieve the second goal: the function {\tt sum} is replaced by {\tt foldl' (+) 0} which is the strict version of {\tt foldl}. This ensures that Haskell uses (and garbage collects) the samples that have already been used. We will find out about forcing strictness later.
+
+We need to import the monadic versions of our random number generator:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Data}.List}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Control}.Monad}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Control}.\Conid{Monad}.MC}{}\<[E]%
+\end{colorcode}\resethooks
+
+This contains our simple Monte Carlo calculator wrapped in the MC monad:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{25}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{simpleMC1b}\mathbin{::}\Conid{Double}\to \Conid{Double}\to \Conid{Double}\to \Conid{Double}\to \Conid{Double}\to \Conid{Int}\to \Conid{MC}\;\Conid{Double}{}\<[E]%
+\\
+\>[B]{}\Varid{simpleMC1b}\;\Varid{expiry}\;\Varid{strike}\;\Varid{spot}\;\Varid{vol}\;\Varid{r}\;\Varid{n}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{xs}\leftarrow \Varid{replicateM}\;\Varid{n}\mathbin{\$}\Varid{normal}\;\mathrm{0.0}\;\mathrm{1.0}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;\Varid{variance}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{vol}\mathbin{*}\Varid{vol}\mathbin{*}\Varid{expiry}{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{rootVariance}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{sqrt}\;\Varid{variance}{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{itoCorr}{}\<[25]%
+\>[25]{}\mathrel{=}(\mathbin{-}\mathrm{0.5})\mathbin{*}\Varid{variance}{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{mSpot}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{spot}\mathbin{*}\Varid{exp}\;(\Varid{r}\mathbin{*}\Varid{expiry}\mathbin{+}\Varid{itoCorr}){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{sumItem}\;\Varid{gaussian}{}\<[25]%
+\>[25]{}\mathrel{=}\mathbf{if}\;\Varid{payoff}\mathbin{>}\mathrm{0}\;\mathbf{then}\;\Varid{payoff}\;\mathbf{else}\;\mathrm{0}{}\<[E]%
+\\
+\>[7]{}\hsindent{2}{}\<[9]%
+\>[9]{}\mathbf{where}\;\Varid{payoff}\mathrel{=}(\mathbin{-}\Varid{strike})\mathbin{+}\Varid{mSpot}\mathbin{*}\Varid{exp}\;(\Varid{rootVariance}\mathbin{*}\Varid{gaussian}){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{sumAll}\mathrel{=}\Varid{foldl'}\;(\mathbin{+})\;\mathrm{0}\mathbin{\$}\Varid{map}\;\Varid{sumItem}\;\Varid{xs}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{return}\;(\Varid{exp}\;((\mathbin{-}\Varid{r})\mathbin{*}\Varid{expiry})\mathbin{*}\Varid{sumAll}\mathbin{/}(\Varid{fromIntegral}\;\Varid{n})){}\<[E]%
+\end{colorcode}\resethooks
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{askForInput}\;\Varid{statement}\mathrel{=}\Varid{putStrLn}\;\Varid{statement}\sequ (\Varid{liftM}\;\Varid{read}\mathbin{\$}\Varid{getLine}){}\<[E]%
+\end{colorcode}\resethooks
+
+Main function doing the input and output:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{11}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{12}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{main}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{expiry}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~Expiry\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{strike}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~strike\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{spot}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~spot\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{vol}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~vol\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{r}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~r\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{n}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~number~of~paths\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;\Varid{seed}\mathrel{=}\mathrm{0}{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{val}{}\<[12]%
+\>[12]{}\mathrel{=}\Varid{evalMC}\;(\Varid{simpleMC1b}\;\Varid{expiry}\;\Varid{strike}\;\Varid{spot}\;\Varid{vol}\;\Varid{r}\;\Varid{n})\mathbin{\$}\Varid{mt19937}\;\Varid{seed}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{putStrLn}\mathbin{\$}\Varid{show}\;\Varid{val}{}\<[E]%
+\end{colorcode}\resethooks
+
+\subsection{Parameters}
+
+Parameters could be nicely wrapped into a parameters class - implementing it initially for a constant Double:
+
+We need a couple of functions in this class:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{module}\;\Conid{Parameter}\;\mathbf{where}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{class}\;\Conid{Parameter}\;\Varid{a}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{integral}\mathbin{::}\Varid{a}\to \Conid{Double}\to \Conid{Double}\to \Conid{Double}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{integralSquare}\mathbin{::}\Varid{a}\to \Conid{Double}\to \Conid{Double}\to \Conid{Double}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{mean}\mathbin{::}\Varid{a}\to \Conid{Double}\to \Conid{Double}\to \Conid{Double}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{mean}\;\Varid{param}\;\Varid{t1}\;\Varid{t2}\mathrel{=}(\Varid{integral}\;\Varid{param}\;\Varid{t1}\;\Varid{t2})\mathbin{/}(\Varid{t2}\mathbin{-}\Varid{t1}){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{rootMeanSquare}\mathbin{::}\Varid{a}\to \Conid{Double}\to \Conid{Double}\to \Conid{Double}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{rootMeanSquare}\;\Varid{param}\;\Varid{t1}\;\Varid{t2}\mathrel{=}(\Varid{integralSquare}\;\Varid{param}\;\Varid{t1}\;\Varid{t2})\mathbin{/}(\Varid{t2}\mathbin{-}\Varid{t1}){}\<[E]%
+\end{colorcode}\resethooks
+
+And our instance for a constand Double:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{instance}\;\Conid{Parameter}\;\Conid{Double}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{integral}\;\Varid{param}\;\Varid{t1}\;\Varid{t2}\mathrel{=}\Varid{param}\mathbin{*}(\Varid{t2}\mathbin{-}\Varid{t1}){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{integralSquare}\;\Varid{param}\;\Varid{t1}\;\Varid{t2}\mathrel{=}\Varid{param}\mathbin{*}\Varid{param}\mathbin{*}(\Varid{t2}\mathbin{-}\Varid{t1}){}\<[E]%
+\end{colorcode}\resethooks
+
+\subsection{Using the Parameters Class}
+
+We need to include our new module as well:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Data}.List}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Control}.Monad}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Control}.\Conid{Monad}.MC}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Payoff}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Option}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Parameter}{}\<[E]%
+\end{colorcode}\resethooks
+
+Our simple Monte Carlo calculator changes to:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{14}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{25}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{simpleMC4}\mathbin{::}(\Conid{PayoffClass}\;\Varid{a},\Conid{Parameter}\;\Varid{b})\Rightarrow (\Conid{Option}\;\Varid{a})\to \Conid{Double}\to \Varid{b}\to \Varid{b}\to \Conid{Int}{}\<[E]%
+\\
+\>[B]{}\hsindent{14}{}\<[14]%
+\>[14]{}\to \Conid{MC}\;\Conid{Double}{}\<[E]%
+\\
+\>[B]{}\Varid{simpleMC4}\;\Varid{op}\;\Varid{spot}\;\Varid{vol}\;\Varid{r}\;\Varid{n}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{xs}\leftarrow \Varid{replicateM}\;\Varid{n}\mathbin{\$}\Varid{normal}\;\mathrm{0.0}\;\mathrm{1.0}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;\Varid{rt}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{integral}\;\Varid{r}\;\mathrm{0}\;(\Varid{expiry}\;\Varid{op}){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{variance}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{integralSquare}\;\Varid{vol}\;\mathrm{0}\;(\Varid{expiry}\;\Varid{op}){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{rootVariance}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{sqrt}\;\Varid{variance}{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{itoCorr}{}\<[25]%
+\>[25]{}\mathrel{=}(\mathbin{-}\mathrm{0.5})\mathbin{*}\Varid{variance}{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{mSpot}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{spot}\mathbin{*}\Varid{exp}\;(\Varid{rt}\mathbin{+}\Varid{itoCorr}){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{sumItem}\;\Varid{gaussian}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{payoff}\;(\Varid{pay}\;\Varid{op})\mathbin{\$}\Varid{mSpot}\mathbin{*}\Varid{exp}\;(\Varid{rootVariance}\mathbin{*}\Varid{gaussian}){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{sumAll}\mathrel{=}\Varid{foldl'}\;(\mathbin{+})\;\mathrm{0}\mathbin{\$}\Varid{map}\;\Varid{sumItem}\;\Varid{xs}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{return}\;(\Varid{exp}\;(\mathbin{-}\Varid{rt})\mathbin{*}\Varid{sumAll}\mathbin{/}(\Varid{fromIntegral}\;\Varid{n})){}\<[E]%
+\end{colorcode}\resethooks
+
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{askForInput}\;\Varid{statement}\mathrel{=}\Varid{putStrLn}\;\Varid{statement}\sequ (\Varid{liftM}\;\Varid{read}\mathbin{\$}\Varid{getLine}){}\<[E]%
+\end{colorcode}\resethooks
+
+Main function doing the input and output:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{11}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{12}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{16}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{main}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{temp}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~option~type~(1~=~Call,~other~=~Put)\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{expiry}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~Expiry\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{strike}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~strike\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{spot}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~spot\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{vol}{}\<[11]%
+\>[11]{}\leftarrow (\Varid{askForInput}\;\text{\tt \char34 Enter~vol\char34})\mathbin{::}\Conid{IO}\;\Conid{Double}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{r}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~r\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{n}{}\<[11]%
+\>[11]{}\leftarrow \Varid{askForInput}\;\text{\tt \char34 Enter~number~of~paths\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;\Varid{option}\mathrel{=}\mathbf{if}\;\Varid{temp}\equiv \mathrm{1}{}\<[E]%
+\\
+\>[3]{}\hsindent{13}{}\<[16]%
+\>[16]{}\mathbf{then}\;\Conid{Option}\;\Varid{expiry}\;(\Conid{VOPayoff}\;\Conid{Call}\;\Varid{strike}){}\<[E]%
+\\
+\>[3]{}\hsindent{13}{}\<[16]%
+\>[16]{}\mathbf{else}\;\Conid{Option}\;\Varid{expiry}\;(\Conid{VOPayoff}\;\Conid{Put}\;\Varid{strike}){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;\Varid{seed}\mathrel{=}\mathrm{0}{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{val}{}\<[12]%
+\>[12]{}\mathrel{=}\Varid{evalMC}\;(\Varid{simpleMC4}\;\Varid{option}\;\Varid{spot}\;\Varid{vol}\;\Varid{r}\;\Varid{n})\mathbin{\$}\Varid{mt19937}\;\Varid{seed}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{putStrLn}\mathbin{\$}\Varid{show}\;\Varid{val}{}\<[E]%
+\end{colorcode}\resethooks
+
+\subsection{Concepts introduced}
+
+\begin{description}
+\item[Monads] \emph{This needs either in depth explanation here or at the start \dots}
+\end{description}
+
+\subsection{Next Steps}
+
+So far most of these changes are trivial - no major hoops have to be jumped through to get to a nice encapsulated approach. Most of the sorrows are being well taken care of by Haskell as a language. This is all as one would hope. Some things stand out as wanting improvement:
+
+\begin{itemize}
+\item It would be nice to have statistics on the calculations
+\item Reading of the data line by line is not a nice way of constructing the option data to be priced - reading a data file would be nicer.
+\item Computers come with multiple cores these days and Monte Carlo is an embarrassing parallel technique - this should be parallelised.
+\end{itemize}
+
+\section{Parsing an Input File}
+
+To keep our code clean and small we should factor out the reading of input parameters. This is done by parsing an input file - or string if done through a pipe.
+
+Haskell comes with a very strong parser (namely Parsec), replacing complicated manipulations with lexers that is necessary in other languages. Below a short parser that will be able to parse the following format:
+
+\subsection{The Input File Format}
+
+\begin{tabbing}\tt
+~Option~\char123{}\\
+\tt ~~~Expiry\char58{}~1\char46{}0\\
+\tt ~~~Payoff\char58{}~Call~at~50\char46{}0\\
+\tt ~\char125{}\\
+\tt ~\\
+\tt ~Fixing~\char123{}\\
+\tt ~~~Spot\char58{}~45\char46{}0\\
+\tt ~~~Vol\char58{}~0\char46{}1\\
+\tt ~~~Rate\char58{}~0\char46{}1\\
+\tt ~\char125{}\\
+\tt ~\\
+\tt ~Params~\char123{}\\
+\tt ~~~Paths\char58{}~1000000\\
+\tt ~\char125{}
+\end{tabbing}
+
+The different parts of the input file are positional and the order as well - which can be easily changed.
+
+\subsection{Applicative Parsec}
+
+We will be using an applicative extension of Parsec, easily produced through the definition of the following module:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{3E}{@{}l@{}}%
+\column{4}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{11}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{module}\;\Conid{ApplicativeParsec}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}({}\<[3E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\mathbf{module}\;\Conid{\Conid{Control}.Applicative},{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\mathbf{module}\;\Conid{\Conid{Text}.\Conid{ParserCombinators}.Parsec}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}){}\<[3E]%
+\\
+\>[3]{}\hsindent{1}{}\<[4]%
+\>[4]{}\mathbf{where}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Control}.Applicative}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Control}.Monad}\;(\Conid{MonadPlus}\;(\mathinner{\ldotp\ldotp}),\Varid{ap}){}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Text}.\Conid{ParserCombinators}.Parsec}\;\Varid{hiding}\;(\Varid{many},\Varid{optional},(\mathbin{<|>})){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{instance}\;\Conid{Applicative}\;(\Conid{GenParser}\;\Varid{s}\;\Varid{a})\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\Varid{pure}{}\<[11]%
+\>[11]{}\mathrel{=}\Varid{return}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}(\mathbin{<*>})\mathrel{=}\Varid{ap}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{instance}\;\Conid{Alternative}\;(\Conid{GenParser}\;\Varid{s}\;\Varid{a})\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\Varid{empty}\mathrel{=}\Varid{mzero}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}(\mathbin{<|>})\mathrel{=}\Varid{mplus}{}\<[E]%
+\end{colorcode}\resethooks
+
+\subsection{Implementing the Parser}
+
+The definition of the applicative instance for the parser allows to parse the return data types in a concise and readable way - once one gets used to it.
+
+Imagining the data type foo that takes two integers to be defined:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{data}\;\Conid{Foo}\mathrel{=}\Conid{Foo}\;\{\mskip1.5mu \Varid{first}\mathbin{::}\Conid{String},\Varid{second}\mathbin{::}\Conid{String}\mskip1.5mu\}{}\<[E]%
+\end{colorcode}\resethooks
+
+The constructor is a function of the following type:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Conid{Foo}\mathbin{::}\Conid{String}\to \Conid{String}\to \Conid{Foo}{}\<[E]%
+\end{colorcode}\resethooks
+
+Each individual parser give back the parsed value - for example a string:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{parseString}\mathbin{::}\Conid{CharParser}\;\Varid{st}\;\Conid{String}{}\<[E]%
+\\
+\>[B]{}\Varid{parseString}\mathrel{=}\Varid{string}\;\text{\tt \char34 foo\char34}{}\<[E]%
+\end{colorcode}\resethooks
+
+We would now like to parse some text, retain two string values and return these in the data type Foo:
+
+\begin{tabbing}\tt
+~first\char58{}~foo\\
+\tt ~second\char58{}~notfoo
+\end{tabbing}
+
+Without the applicative parser this would look like this:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{parseIt1}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{spaces}\sequ \Varid{string}\;\text{\tt \char34 first:\char34}\sequ \Varid{spaces}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{first}\leftarrow \Varid{many1}\;\Varid{letter}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{spaces}\sequ \Varid{string}\;\text{\tt \char34 second:\char34}\sequ \Varid{spaces}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{second}\leftarrow \Varid{many1}\;\Varid{letter}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{return}\;(\Conid{Foo}\;\Varid{first}\;\Varid{second}){}\<[E]%
+\end{colorcode}\resethooks
+
+This can parse our sample input successfully:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{parse}\;\Varid{parseIt1}\;\text{\tt \char34 from~string\char34}\;\text{\tt \char34 first:~foo~\char92 n~~second:~notfoo\char34}{}\<[E]%
+\end{colorcode}\resethooks
+
+With ApplicativeParsec we can chain the different parts of the parser with the operator \text{\tt \char60{}\char42{}\char62{}} and lift the constructor into it with \text{\tt \char60{}\char36{}\char62{}}. The chained parsers will be given as an argument chain to the lifted function:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{testParse\char95 a}\mathrel{=}\Conid{Foo}\mathbin{<\$>}\Varid{firstparser}\mathbin{<*>}\Varid{secondparser}{}\<[E]%
+\end{colorcode}\resethooks
+
+We might want to intersperse the parsers that return values with our syntax. To chain 2 parsers but only give back the result of the first (or second) as an argument, we use the operators \text{\tt \char60{}\char42{}} and \text{\tt \char42{}\char62{}}. Our parser becomes:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{parseIt2}\mathrel{=}\Conid{Foo}\mathbin{<\$>}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}(\Varid{spaces}\sequ \Varid{string}\;\text{\tt \char34 first:\char34}\sequ \Varid{spaces}\sequ \Varid{many1}\;\Varid{letter})\mathbin{<*>}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}(\Varid{spaces}\sequ \Varid{string}\;\text{\tt \char34 second:\char34}\sequ \Varid{spaces}\sequ \Varid{many1}\;\Varid{letter}){}\<[E]%
+\end{colorcode}\resethooks
+
+This halves the lines required to define the parser without defining intermediate names for the different parts that are parsed.
+
+\subsubsection{Defining some Data Types}
+
+It would be nice to wrap the different entities we want to parse into data types. We already did that for Option and Payoff. Now here come Fixing and InputParams:
+
+\paragraph{Fixing} \mbox{} \linebreak  \mbox{}
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{module}\;\Conid{Fixing}\;\mathbf{where}{}\<[E]%
+\end{colorcode}\resethooks
+
+Simple data type for our two fixings.
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{11}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{11E}{@{}l@{}}%
+\column{13}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{data}\;\Conid{Fixing}\mathrel{=}\Conid{Fixing}\;\{\mskip1.5mu {}\<[E]%
+\\
+\>[B]{}\hsindent{13}{}\<[13]%
+\>[13]{}\Varid{spot}\mathbin{::}\Conid{Double},{}\<[E]%
+\\
+\>[B]{}\hsindent{13}{}\<[13]%
+\>[13]{}\Varid{vol}\mathbin{::}\Conid{Double},{}\<[E]%
+\\
+\>[B]{}\hsindent{13}{}\<[13]%
+\>[13]{}\Varid{rate}\mathbin{::}\Conid{Double}{}\<[E]%
+\\
+\>[B]{}\hsindent{11}{}\<[11]%
+\>[11]{}\mskip1.5mu\}{}\<[11E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{deriving}\;(\Conid{Show}){}\<[E]%
+\end{colorcode}\resethooks
+
+\paragraph{InputParams}  \mbox{} \linebreak  \mbox{}
+
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{module}\;\Conid{InputParams}\;\mathbf{where}{}\<[E]%
+\end{colorcode}\resethooks
+
+Simple data type for our numerical parameters.
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{11}{@{}>{\hspre}c<{\hspost}@{}}%
+\column{11E}{@{}l@{}}%
+\column{13}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{data}\;\Conid{Params}\mathrel{=}\Conid{Params}\;\{\mskip1.5mu {}\<[E]%
+\\
+\>[B]{}\hsindent{13}{}\<[13]%
+\>[13]{}\Varid{numPaths}\mathbin{::}\Conid{Int}{}\<[E]%
+\\
+\>[B]{}\hsindent{11}{}\<[11]%
+\>[11]{}\mskip1.5mu\}{}\<[11E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{deriving}\;(\Conid{Show}){}\<[E]%
+\end{colorcode}\resethooks
+
+\subsubsection{The actual Parser}
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{module}\;\Conid{Parse}\;\mathbf{where}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{import}\;\Conid{Numeric}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Payoff}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Option}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Fixing}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{InputParams}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{ApplicativeParsec}{}\<[E]%
+\end{colorcode}\resethooks
+
+Parse all parts of the file:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{30}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{optionFile}\mathrel{=}\Varid{returnVals}\mathbin{<\$>}{}\<[30]%
+\>[30]{}\Varid{opt}\mathbin{<*>}\Varid{fixings}\mathbin{<*>}\Varid{numParams}\mathbin{<*}(\Varid{spaces}\sequ \Varid{eof})\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\Varid{returnVals}\;\Varid{a}\;\Varid{b}\;\Varid{c}\mathrel{=}(\Varid{a},\Varid{b},\Varid{c}){}\<[E]%
+\end{colorcode}\resethooks
+
+Parse the product first:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{39}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{55}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{opt}\mathrel{=}\Conid{Option}\mathbin{<\$>}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}(\Varid{spaces}\sequ \Varid{string}\;\text{\tt \char34 Option\char34}\sequ \Varid{spaces}\sequ \Varid{string}\;\text{\tt \char34 \char123 \char34}\sequ \Varid{p\char95 expiry})\mathbin{<*>}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{p\char95 payoff}\mathbin{<*}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}(\Varid{spaces}\sequ \Varid{string}\;\text{\tt \char34 \char125 \char34}\sequ \Varid{eol}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{p\char95 expiry}\mathrel{=}(\Varid{spaces}\sequ (\Varid{string}\;\text{\tt \char34 Expiry:\char34})\sequ \Varid{spaces})\mathbin{*>}(\Varid{p\char95 number}\mathbin{<?>}\text{\tt \char34 d1\char34}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{p\char95 payoff}\mathrel{=}\Varid{option}\mathbin{<\$>}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}(\Varid{spaces}\sequ (\Varid{string}\;\text{\tt \char34 Payoff:\char34})\sequ \Varid{spaces}\sequ (\Varid{string}\;\text{\tt \char34 Call\char34}\mathbin{<|>}\Varid{string}\;\text{\tt \char34 Put\char34}))\mathbin{<*>}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}(\Varid{spaces1}\sequ (\Varid{string}\;\text{\tt \char34 at\char34})\sequ \Varid{spaces1}\sequ (\Varid{p\char95 number}\mathbin{<?>}\text{\tt \char34 d1\char34}))\;\mathbf{where}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{option}\;\Varid{str}\;\Varid{strike}\mid \Varid{str}\equiv \text{\tt \char34 Call\char34}\mathrel{=}\Conid{VOPayoff}\;\Conid{Call}\;\Varid{strike}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{option}\;\Varid{str}\;\Varid{strike}\mid \Varid{str}\equiv \text{\tt \char34 Put\char34}{}\<[39]%
+\>[39]{}\mathrel{=}\Conid{VOPayoff}\;\Conid{Put}\;{}\<[55]%
+\>[55]{}\Varid{strike}{}\<[E]%
+\end{colorcode}\resethooks
+
+Parse our 2 fixings:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{fixings}\mathrel{=}\Conid{Fixing}\mathbin{<\$>}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}(\Varid{spaces}\sequ (\Varid{string}\;\text{\tt \char34 Fixing\char34})\sequ \Varid{spaces}\sequ (\Varid{string}\;\text{\tt \char34 \char123 \char34})\sequ \Varid{p\char95 spot})\mathbin{<*>}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}(\Varid{spaces}\sequ \Varid{p\char95 vol})\mathbin{<*>}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}(\Varid{spaces}\sequ \Varid{p\char95 rate})\mathbin{<*}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}(\Varid{spaces}\sequ \Varid{string}\;\text{\tt \char34 \char125 \char34}\sequ \Varid{eol}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{p\char95 spot}\mathrel{=}(\Varid{spaces}\sequ (\Varid{string}\;\text{\tt \char34 Spot:\char34})\sequ \Varid{spaces})\mathbin{*>}(\Varid{p\char95 number}\mathbin{<?>}\text{\tt \char34 d1\char34}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{p\char95 vol}\mathrel{=}(\Varid{spaces}\sequ (\Varid{string}\;\text{\tt \char34 Vol:\char34})\sequ \Varid{spaces})\mathbin{*>}(\Varid{p\char95 number}\mathbin{<?>}\text{\tt \char34 d1\char34}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{p\char95 rate}\mathrel{=}(\Varid{spaces}\sequ (\Varid{string}\;\text{\tt \char34 Rate:\char34})\sequ \Varid{spaces})\mathbin{*>}(\Varid{p\char95 number}\mathbin{<?>}\text{\tt \char34 d1\char34}){}\<[E]%
+\end{colorcode}\resethooks
+
+Parse our parameters:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{numParams}\mathrel{=}\Conid{Params}\mathbin{<\$>}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}(\Varid{spaces}\sequ (\Varid{string}\;\text{\tt \char34 Params\char34})\sequ \Varid{spaces}\sequ (\Varid{string}\;\text{\tt \char34 \char123 \char34})\sequ \Varid{p\char95 paths})\mathbin{<*}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}(\Varid{spaces}\sequ \Varid{string}\;\text{\tt \char34 \char125 \char34}\sequ \Varid{eol}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{p\char95 paths}\mathrel{=}(\Varid{spaces}\sequ (\Varid{string}\;\text{\tt \char34 Paths:\char34})\sequ \Varid{spaces})\mathbin{*>}(\Varid{p\char95 integer}\mathbin{<?>}\text{\tt \char34 d1\char34}){}\<[E]%
+\end{colorcode}\resethooks
+
+Some general parsers:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{15}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{p\char95 number}\mathbin{::}\Conid{CharParser}\;()\;\Conid{Double}{}\<[E]%
+\\
+\>[B]{}\Varid{p\char95 number}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{s}\leftarrow \Varid{getInput}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{case}\;\Varid{readSigned}\;\Varid{readFloat}\;\Varid{s}\;\mathbf{of}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}[\mskip1.5mu (\Varid{n},\Varid{s'})\mskip1.5mu]\to \Varid{n}\mathbin{<\$}\Varid{setInput}\;\Varid{s'}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\anonymous {}\<[15]%
+\>[15]{}\to \Varid{empty}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{p\char95 integer}\mathbin{::}\Conid{CharParser}\;()\;\Conid{Int}{}\<[E]%
+\\
+\>[B]{}\Varid{p\char95 integer}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{s}\leftarrow \Varid{getInput}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{case}\;\Varid{readSigned}\;\Varid{readDec}\;\Varid{s}\;\mathbf{of}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}[\mskip1.5mu (\Varid{n},\Varid{s'})\mskip1.5mu]\to \Varid{n}\mathbin{<\$}\Varid{setInput}\;\Varid{s'}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\anonymous {}\<[15]%
+\>[15]{}\to \Varid{empty}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{eol}\mathrel{=}\Varid{char}\;\text{\tt '\char92 n'}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{spaces1}\mathrel{=}\Varid{many1}\;\Varid{space}{}\<[E]%
+\end{colorcode}\resethooks
+
+\subsection{Using the Parser}
+
+Plenty of new modules to include:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{import}\;\Conid{System}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Data}.List}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Control}.Monad}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Control}.\Conid{Monad}.MC}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{ApplicativeParsec}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{import}\;\Conid{Payoff}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Option}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Parameter}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{InputParams}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Fixing}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Parse}{}\<[E]%
+\end{colorcode}\resethooks
+
+Our simple Monte Carlo calculator:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{25}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{simpleMC4b}\mathbin{::}(\Conid{PayoffClass}\;\Varid{a})\Rightarrow (\Conid{Option}\;\Varid{a})\to \Conid{Fixing}\to \Conid{Params}\to \Conid{MC}\;\Conid{Double}{}\<[E]%
+\\
+\>[B]{}\Varid{simpleMC4b}\;\Varid{opt}\;\Varid{fixing}\;\Varid{params}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{xs}\leftarrow \Varid{replicateM}\;(\Varid{numPaths}\;\Varid{params})\mathbin{\$}\Varid{normal}\;\mathrm{0.0}\;\mathrm{1.0}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;\Varid{rt}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{integral}\;(\Varid{rate}\;\Varid{fixing})\;\mathrm{0}\;(\Varid{expiry}\;\Varid{opt}){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{variance}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{integralSquare}\;(\Varid{vol}\;\Varid{fixing})\;\mathrm{0}\;(\Varid{expiry}\;\Varid{opt}){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{rootVariance}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{sqrt}\;\Varid{variance}{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{itoCorr}{}\<[25]%
+\>[25]{}\mathrel{=}(\mathbin{-}\mathrm{0.5})\mathbin{*}\Varid{variance}{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{mSpot}{}\<[25]%
+\>[25]{}\mathrel{=}(\Varid{spot}\;\Varid{fixing})\mathbin{*}\Varid{exp}\;(\Varid{rt}\mathbin{+}\Varid{itoCorr}){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{sumItem}\;\Varid{gaussian}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{payoff}\;(\Varid{pay}\;\Varid{opt})\mathbin{\$}\Varid{mSpot}\mathbin{*}\Varid{exp}\;(\Varid{rootVariance}\mathbin{*}\Varid{gaussian}){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{sumAll}\mathrel{=}\Varid{foldl'}\;(\mathbin{+})\;\mathrm{0}\mathbin{\$}\Varid{map}\;\Varid{sumItem}\;\Varid{xs}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{return}\;(\Varid{exp}\;(\mathbin{-}\Varid{rt})\mathbin{*}\Varid{sumAll}\mathbin{/}(\Varid{fromIntegral}\mathbin{\$}\Varid{numPaths}\;\Varid{params})){}\<[E]%
+\end{colorcode}\resethooks
+
+Main function doing the input and output is now significantly shorter and nicer:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{15}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{main}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{args}\leftarrow \Varid{getArgs}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{res}\leftarrow \Varid{parseFromFile}\;\Varid{optionFile}\;(\Varid{head}\;\Varid{args}){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;\Varid{val}\mathrel{=}\mathbf{case}\;\Varid{res}\;\mathbf{of}{}\<[E]%
+\\
+\>[3]{}\hsindent{12}{}\<[15]%
+\>[15]{}\Conid{Right}\;(\Varid{opt},\Varid{fixing},\Varid{params})\to {}\<[E]%
+\\
+\>[15]{}\hsindent{2}{}\<[17]%
+\>[17]{}\Varid{show}\mathbin{\$}\Varid{evalMC}\;(\Varid{simpleMC4b}\;\Varid{opt}\;\Varid{fixing}\;\Varid{params})\mathbin{\$}\Varid{mt19937}\;\mathrm{0}{}\<[E]%
+\\
+\>[3]{}\hsindent{12}{}\<[15]%
+\>[15]{}\Conid{Left}\;\anonymous \to \text{\tt \char34 Could~not~parse~file.\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{putStrLn}\;\Varid{val}{}\<[E]%
+\end{colorcode}\resethooks
+
+\section{Gathering Statistics}
+
+\subsection{The Statistics Type Class}
+
+Defining a simple type class for gathering stats, together with one instance to get the mean:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{13}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{module}\;\Conid{Stats}\;\mathbf{where}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{class}\;\Conid{Stats}\;\Varid{a}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{zero}\mathbin{::}\Varid{a}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{dumpOne}\mathbin{::}\Varid{a}\to \Conid{Double}\to \Varid{a}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{getRes}\mathbin{::}\Varid{a}\to [\mskip1.5mu [\mskip1.5mu \Conid{Double}\mskip1.5mu]\mskip1.5mu]{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{data}\;\Conid{Mean}\mathrel{=}\Conid{Mean}\;\{\mskip1.5mu \Varid{sum}\mathbin{::}\Conid{Double},\Varid{nPaths}\mathbin{::}\Conid{Int}\mskip1.5mu\}\;\mathbf{deriving}\;\Conid{Show}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{instance}\;\Conid{Stats}\;\Conid{Mean}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{zero}\mathrel{=}\Conid{Mean}\;\mathrm{0}\;\mathrm{0}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{dumpOne}\;(\Conid{Mean}\;\Varid{s}\;\Varid{n})\;\Varid{res}\mathrel{=}\Varid{newSum}\mathbin{\Varid{`seq`}}\Varid{newN}\mathbin{\Varid{`seq`}}\Conid{Mean}\;\Varid{newSum}\;\Varid{newN}\;\mathbf{where}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{newSum}{}\<[13]%
+\>[13]{}\mathrel{=}\Varid{s}\mathbin{+}\Varid{res}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{newN}{}\<[13]%
+\>[13]{}\mathrel{=}\Varid{n}\mathbin{+}\mathrm{1}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{getRes}\;(\Conid{Mean}\;\Varid{s}\;\Varid{n})\mathrel{=}[\mskip1.5mu [\mskip1.5mu \Varid{s}\mathbin{/}(\Varid{fromIntegral}\;\Varid{n})\mskip1.5mu]\mskip1.5mu]{}\<[E]%
+\end{colorcode}\resethooks
+
+This type class can now be used by our simple Monte Carlo funtion:
+
+More modules:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{import}\;\Conid{System}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Data}.List}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Control}.Monad}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Control}.\Conid{Monad}.MC}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{ApplicativeParsec}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{import}\;\Conid{Payoff}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Option}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Parameter}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{InputParams}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Fixing}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Parse}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Stats}{}\<[E]%
+\end{colorcode}\resethooks
+
+Our simple Monte Carlo calculator:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{25}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{simpleMC5}\mathbin{::}(\Conid{PayoffClass}\;\Varid{a},\Conid{Stats}\;\Varid{c})\Rightarrow (\Conid{Option}\;\Varid{a})\to \Conid{Fixing}\to \Conid{Params}\to \Conid{MC}\;\Varid{c}{}\<[E]%
+\\
+\>[B]{}\Varid{simpleMC5}\;\Varid{opt}\;\Varid{fixing}\;\Varid{params}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{xs}\leftarrow \Varid{replicateM}\;(\Varid{numPaths}\;\Varid{params})\mathbin{\$}\Varid{normal}\;\mathrm{0.0}\;\mathrm{1.0}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;\Varid{rt}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{integral}\;(\Varid{rate}\;\Varid{fixing})\;\mathrm{0}\;(\Varid{expiry}\;\Varid{opt}){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{variance}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{integralSquare}\;(\Varid{vol}\;\Varid{fixing})\;\mathrm{0}\;(\Varid{expiry}\;\Varid{opt}){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{rootVariance}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{sqrt}\;\Varid{variance}{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{itoCorr}{}\<[25]%
+\>[25]{}\mathrel{=}(\mathbin{-}\mathrm{0.5})\mathbin{*}\Varid{variance}{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{mSpot}{}\<[25]%
+\>[25]{}\mathrel{=}(\Varid{spot}\;\Varid{fixing})\mathbin{*}\Varid{exp}\;(\Varid{rt}\mathbin{+}\Varid{itoCorr}){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{sumItem}\;\Varid{gaussian}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{exp}\;(\mathbin{-}\Varid{rt})\mathbin{*}(\Varid{payoff}\;(\Varid{pay}\;\Varid{opt})\mathbin{\$}\Varid{mSpot}\mathbin{*}\Varid{exp}\;(\Varid{rootVariance}\mathbin{*}\Varid{gaussian})){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{sumAll}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{foldl'}\;\Varid{dumpOne}\;\Varid{zero}\mathbin{\$}\Varid{map}\;\Varid{sumItem}\;\Varid{xs}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{return}\;\Varid{sumAll}{}\<[E]%
+\end{colorcode}\resethooks
+
+Main function doing the input and output is now significantly shorter and nicer:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{15}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{main}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{args}\leftarrow \Varid{getArgs}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{res}\leftarrow \Varid{parseFromFile}\;\Varid{optionFile}\;(\Varid{head}\;\Varid{args}){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;\Varid{val}\mathrel{=}\mathbf{case}\;\Varid{res}\;\mathbf{of}{}\<[E]%
+\\
+\>[3]{}\hsindent{12}{}\<[15]%
+\>[15]{}\Conid{Right}\;(\Varid{opt},\Varid{fixing},\Varid{params})\to {}\<[E]%
+\\
+\>[15]{}\hsindent{2}{}\<[17]%
+\>[17]{}\Varid{show}\mathbin{\$}\Varid{getRes}\mathbin{\$}\Varid{evalMC}\;((\Varid{simpleMC5}\;\Varid{opt}\;\Varid{fixing}\;\Varid{params})\mathbin{::}\Conid{MC}\;\Conid{Mean})\mathbin{\$}\Varid{mt19937}\;\mathrm{0}{}\<[E]%
+\\
+\>[3]{}\hsindent{12}{}\<[15]%
+\>[15]{}\Conid{Left}\;\anonymous \to \text{\tt \char34 Could~not~parse~file.\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{putStrLn}\;\Varid{val}{}\<[E]%
+\end{colorcode}\resethooks
+
+\subsection{Convergence Table}
+
+The convergence table implementation looks very similar:
+
+Defining the convergence table on any stats type:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{module}\;\Conid{ConvTable}\;\mathbf{where}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{import}\;\Conid{Stats}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{data}\;\Conid{ConvTable}\;\Varid{a}\mathrel{=}\Conid{ConvTable}\;\{\mskip1.5mu {}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{count}\mathbin{::}\Conid{Int},{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{nextLimit}\mathbin{::}\Conid{Int},{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{currStat}\mathbin{::}\Varid{a},{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{resList}\mathbin{::}[\mskip1.5mu [\mskip1.5mu \Conid{Double}\mskip1.5mu]\mskip1.5mu]\mskip1.5mu\}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{instance}\;(\Conid{Stats}\;\Varid{a})\Rightarrow (\Conid{Stats}\;(\Conid{ConvTable}\;\Varid{a}))\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{zero}\mathrel{=}(\Conid{ConvTable}\;\mathrm{0}\;\mathrm{1}\;\Varid{zero}\;[\mskip1.5mu \mskip1.5mu]){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{dumpOne}\;(\Conid{ConvTable}\;\Varid{c}\;\Varid{l}\;\Varid{curr}\;\Varid{xs})\;\Varid{s}\mathrel{=}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{nc}\mathbin{\Varid{`seq`}}\Varid{ncurr}\mathbin{\Varid{`seq`}}\Varid{nl}\mathbin{\Varid{`seq`}}\Varid{nxs}\mathbin{\Varid{`seq`}}(\Conid{ConvTable}\;\Varid{nc}\;\Varid{nl}\;\Varid{ncurr}\;\Varid{nxs})\;\mathbf{where}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{nc}\mathrel{=}\Varid{c}\mathbin{+}\mathrm{1}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Varid{ncurr}\mathrel{=}\Varid{dumpOne}\;\Varid{curr}\;\Varid{s}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}(\Varid{nl},\Varid{nxs})\mathrel{=}\mathbf{if}\;\Varid{nc}\equiv \Varid{l}\;\mathbf{then}\;(\Varid{l}\mathbin{*}\mathrm{2},(\Varid{head}\mathbin{\$}\Varid{getRes}\;\Varid{ncurr})\mathbin{:}\Varid{xs}){}\<[E]%
+\\
+\>[5]{}\hsindent{12}{}\<[17]%
+\>[17]{}\mathbf{else}\;(\Varid{l},\Varid{xs}){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{getRes}\;(\Conid{ConvTable}\;\Varid{c}\;\Varid{l}\;\Varid{curr}\;\Varid{xs})\mathrel{=}{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\mathbf{if}\;\Varid{c}\equiv \Varid{l}\;\mathbf{then}\;\Varid{xs}\;\mathbf{else}\;(\Varid{head}\mathbin{\$}\Varid{getRes}\;\Varid{curr})\mathbin{:}\Varid{xs}{}\<[E]%
+\end{colorcode}\resethooks
+
+Only the main function needs modification to use this - since the return type changed:
+
+The modules:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{import}\;\Conid{System}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Data}.List}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Control}.Monad}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{\Conid{Control}.\Conid{Monad}.MC}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{ApplicativeParsec}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{import}\;\Conid{Payoff}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Option}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Parameter}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{InputParams}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Fixing}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Parse}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{Stats}{}\<[E]%
+\\
+\>[B]{}\mathbf{import}\;\Conid{ConvTable}{}\<[E]%
+\end{colorcode}\resethooks
+
+Our simple Monte Carlo calculator:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{7}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{25}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{simpleMC5}\mathbin{::}(\Conid{PayoffClass}\;\Varid{a},\Conid{Stats}\;\Varid{c})\Rightarrow (\Conid{Option}\;\Varid{a})\to \Conid{Fixing}\to \Conid{Params}\to \Conid{MC}\;\Varid{c}{}\<[E]%
+\\
+\>[B]{}\Varid{simpleMC5}\;\Varid{opt}\;\Varid{fixing}\;\Varid{params}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{xs}\leftarrow \Varid{replicateM}\;(\Varid{numPaths}\;\Varid{params})\mathbin{\$}\Varid{normal}\;\mathrm{0.0}\;\mathrm{1.0}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;\Varid{rt}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{integral}\;(\Varid{rate}\;\Varid{fixing})\;\mathrm{0}\;(\Varid{expiry}\;\Varid{opt}){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{variance}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{integralSquare}\;(\Varid{vol}\;\Varid{fixing})\;\mathrm{0}\;(\Varid{expiry}\;\Varid{opt}){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{rootVariance}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{sqrt}\;\Varid{variance}{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{itoCorr}{}\<[25]%
+\>[25]{}\mathrel{=}(\mathbin{-}\mathrm{0.5})\mathbin{*}\Varid{variance}{}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{mSpot}{}\<[25]%
+\>[25]{}\mathrel{=}(\Varid{spot}\;\Varid{fixing})\mathbin{*}\Varid{exp}\;(\Varid{rt}\mathbin{+}\Varid{itoCorr}){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{sumItem}\;\Varid{gaussian}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{exp}\;(\mathbin{-}\Varid{rt})\mathbin{*}(\Varid{payoff}\;(\Varid{pay}\;\Varid{opt})\mathbin{\$}\Varid{mSpot}\mathbin{*}\Varid{exp}\;(\Varid{rootVariance}\mathbin{*}\Varid{gaussian})){}\<[E]%
+\\
+\>[3]{}\hsindent{4}{}\<[7]%
+\>[7]{}\Varid{sumAll}{}\<[25]%
+\>[25]{}\mathrel{=}\Varid{foldl'}\;\Varid{dumpOne}\;\Varid{zero}\mathbin{\$}\Varid{map}\;\Varid{sumItem}\;\Varid{xs}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{return}\;\Varid{sumAll}{}\<[E]%
+\end{colorcode}\resethooks
+
+Main function doing the input and output is now significantly shorter and nicer:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{15}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{19}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{main}\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{args}\leftarrow \Varid{getArgs}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{res}\leftarrow \Varid{parseFromFile}\;\Varid{optionFile}\;(\Varid{head}\;\Varid{args}){}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\mathbf{let}\;\Varid{val}\mathrel{=}\mathbf{case}\;\Varid{res}\;\mathbf{of}{}\<[E]%
+\\
+\>[3]{}\hsindent{12}{}\<[15]%
+\>[15]{}\Conid{Right}\;(\Varid{opt},\Varid{fixing},\Varid{params})\to {}\<[E]%
+\\
+\>[15]{}\hsindent{2}{}\<[17]%
+\>[17]{}\Varid{show}\mathbin{\$}\Varid{getRes}\mathbin{\$}{}\<[E]%
+\\
+\>[17]{}\hsindent{2}{}\<[19]%
+\>[19]{}\Varid{evalMC}\;((\Varid{simpleMC5}\;\Varid{opt}\;\Varid{fixing}\;\Varid{params})\mathbin{::}\Conid{MC}\;(\Conid{ConvTable}\;\Conid{Mean}))\mathbin{\$}\Varid{mt19937}\;\mathrm{0}{}\<[E]%
+\\
+\>[3]{}\hsindent{12}{}\<[15]%
+\>[15]{}\Conid{Left}\;\anonymous \to \text{\tt \char34 Could~not~parse~file.\char34}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{putStrLn}\;\Varid{val}{}\<[E]%
+\end{colorcode}\resethooks
+
+\subsection{Concepts introduced}
+
+\begin{description}
+\item[Backticks] To make a function act like an operator one can use the backtick syntax:
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{fu}\;\Varid{a}\;\Varid{b}\mathrel{=}\Varid{a}\mathbin{+}\Varid{b}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\mathbf{let}\;\Varid{c}\mathrel{=}\Varid{fu}\;\mathrm{1}\;\mathrm{2}{}\<[E]%
+\\
+\>[B]{}\mathbf{let}\;\Varid{d}\mathrel{=}\mathrm{1}\mathbin{`\Varid{fu}`}\mathrm{2}{}\<[E]%
+\end{colorcode}\resethooks
+The expressions for \text{\tt c} and \text{\tt d} are equivalent.
+\item[Forcing evaluation with seq] Haskell as a lazy language does not evaluate expressions until they are needed. This is often advantageous, but can lead to space leaks -- the unevaluated expressions are piling up and use a lot of space. This can be easily found by running the programs with \text{\tt \char43{}RTS~\char45{}sstderr} which then prints statistics on the runtime. If the garbage collector uses a high percentage, then there are probably inefficiencies there. The expressions
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{a}\mathbin{\Varid{`seq`}}\Varid{b}{}\<[E]%
+\end{colorcode}\resethooks
+makes sure that the expression \text{\tt a} is fully evaluated, before returning the result of expression \text{\tt b}. So if we want to return a specific type with the type constructor:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{let}\;\Varid{d}\mathrel{=}\Conid{Foo}\;\Varid{a}\;\Varid{b}{}\<[E]%
+\end{colorcode}\resethooks
+
+then we can enforce that no unevaluated bits are left with the following code:
+
+\begin{colorcode}
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{let}\;\Varid{d}\mathrel{=}\Varid{a}\mathbin{\Varid{`seq`}}\Varid{b}\mathbin{\Varid{`seq`}}\Conid{Foo}\;\Varid{a}\;\Varid{b}{}\<[E]%
+\end{colorcode}\resethooks
+
+Did we not do this already with \text{\tt foldl\char39{}}? We kind of did, except that \text{\tt foldl\char39{}} only evaluates to the head normal form, not the fully evaluated expression. Removing the \text{\tt \char96{}seq\char96{}} out of the code above makes it perform very poorly, with over 70\% of the time spent on garbage collection.
+
+Why does unevaluated code create a space leak and why does this have such an impact on performance? The unevalutated code is big and makes the garbage collector reserve a lot of memory. For this the runtime needs to spend a lot of memory -- and time.
+\end{description}
+
+
+\end{document}

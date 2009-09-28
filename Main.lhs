@@ -22,9 +22,9 @@ In the following text which traces a popular book for derivatives pricing in C++
 
 \section{Haskell}
 
-Haskell is great. Everyone should learn it.
+Everyone should learn Haskell.
 
-This text will not try to teach Haskell. Haskell looks different on the first look and on the second look. It has a number of concepts and operators that are unusual. The book ``Real World Haskell'' is a good introduction. Concepts that seem relevant will be briefly introduced, but with that brevity these introductions are not destined to stand alone as any kind of reference.
+Haskell looks different on the first look and on the second look. It has a number of concepts and operators that are unusual. The book ``Real World Haskell'' (by Bryan O'Sullivan, Don Stewart, and John Goerzen) is a good introduction. Concepts that seem relevant will be briefly introduced, but this is not intended to stand alone as any kind of reference.
 
 \section{A Simple Monte Carlo Model}
 \subsection{The Theory}

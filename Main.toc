@@ -1,0 +1,34 @@
+\select@language {english}
+\contentsline {section}{\numberline {1}Preamble}{3}{section.1}
+\contentsline {section}{\numberline {2}Haskell}{3}{section.2}
+\contentsline {section}{\numberline {3}A Simple Monte Carlo Model}{3}{section.3}
+\contentsline {subsection}{\numberline {3.1}The Theory}{3}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}A simple Implementation of a Monte Carlo call option pricer}{4}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Concepts introduced}{5}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}Critiquing the approach}{7}{subsection.3.4}
+\contentsline {section}{\numberline {4}Generalising Payoff and Option Data}{7}{section.4}
+\contentsline {subsection}{\numberline {4.1}Implementing a Payoff Class}{7}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}The Payoff type class}{8}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}Using the Payoff Class}{8}{subsection.4.3}
+\contentsline {subsection}{\numberline {4.4}Implementing an Option Class}{9}{subsection.4.4}
+\contentsline {subsection}{\numberline {4.5}The Option type class}{9}{subsection.4.5}
+\contentsline {subsection}{\numberline {4.6}Using the Option Class}{10}{subsection.4.6}
+\contentsline {subsection}{\numberline {4.7}Concepts introduced}{11}{subsection.4.7}
+\contentsline {section}{\numberline {5}Monadic Random Number Generation}{12}{section.5}
+\contentsline {subsection}{\numberline {5.1}Parameters}{14}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Using the Parameters Class}{14}{subsection.5.2}
+\contentsline {subsection}{\numberline {5.3}Concepts introduced}{15}{subsection.5.3}
+\contentsline {subsection}{\numberline {5.4}Next Steps}{15}{subsection.5.4}
+\contentsline {section}{\numberline {6}Parsing an Input File}{16}{section.6}
+\contentsline {subsection}{\numberline {6.1}The Input File Format}{16}{subsection.6.1}
+\contentsline {subsection}{\numberline {6.2}Applicative Parsec}{16}{subsection.6.2}
+\contentsline {subsection}{\numberline {6.3}Implementing the Parser}{17}{subsection.6.3}
+\contentsline {subsubsection}{\numberline {6.3.1}Defining some Data Types}{18}{subsubsection.6.3.1}
+\contentsline {paragraph}{Fixing}{18}{section*.2}
+\contentsline {paragraph}{InputParams}{19}{section*.3}
+\contentsline {subsubsection}{\numberline {6.3.2}The actual Parser}{19}{subsubsection.6.3.2}
+\contentsline {subsection}{\numberline {6.4}Using the Parser}{21}{subsection.6.4}
+\contentsline {section}{\numberline {7}Gathering Statistics}{22}{section.7}
+\contentsline {subsection}{\numberline {7.1}The Statistics Type Class}{22}{subsection.7.1}
+\contentsline {subsection}{\numberline {7.2}Convergence Table}{23}{subsection.7.2}
+\contentsline {subsection}{\numberline {7.3}Concepts introduced}{24}{subsection.7.3}
