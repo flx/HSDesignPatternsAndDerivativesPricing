@@ -1,0 +1,97 @@
+\let\origlinebreak=\\
+\renewcommand{\sectfont}{\bf}
+\long\def\ignore#1{}
+%let framed = False
+\usepackage[english]{babel}
+\usepackage{hyperref}
+\usepackage{mathpazo}
+\usepackage{colortbl}
+\usepackage{calc}
+\usepackage{paralist}
+\usepackage{ifthen}
+\usepackage{relsize}
+\usepackage{xspace}
+\usepackage{tabularx}
+%if framed
+\usepackage{framed}
+\FrameSep=2\fboxsep
+%endif
+\newcommand*{\PDF}{{\smaller{PDF}}\xspace}
+\newcommand*{\CTAN}{{\smaller{CTAN}}\xspace}
+\setdefaultitem{\textbf{--}}{}{}{}
+\let\defined\textbf
+%let doc = True
+%include lhs2TeX.fmt
+\newlength{\lwidth}
+\newlength{\cwidth}
+\setlength{\lwidth}{0pt}
+\setlength{\cwidth}{0pt}
+%separation 2
+%latency 2
+\let\origcolor=\color
+\newcommand{\dep}[1]{{\origcolor{red}#1}}
+\def\swgt#1{\switch[\value{step}>#1]}%
+\def\ro#1{\ifthenelse{\value{step}=#1}{\origcolor{red}}{}}%
+%hyperref needs some setup, especially after pdfscreen
+\hypersetup{%
+  colorlinks=True,%
+  pdfmenubar=True,%
+  pdfcenterwindow=False,% 
+  pdffitwindow=False}%
+\newcounter{pagesave}
+% This one is with color:
+%subst code a = "\begin{colorcode}'n" a "\end{colorcode}\resethooks'n" 
+\definecolor{rlcolor}{gray}{.8}
+\arrayrulecolor{rlcolor}
+\definecolor{hcolor}{gray}{.7}
+\newenvironment{colorcode}{%
+  \colorsurround
+  \(%
+  \pboxed\SaveRestoreHook}{%
+  \ColumnHook\endpboxed
+  \)%
+  \endcolorsurround}
+\newenvironment{colorsurround}{\colorverb}{\endcolorverb}
+\newenvironment{colorarray}{%
+  \colorsurround
+  \(%
+  \array}{%
+  \endarray
+  \)%
+  \endcolorsurround}
+\makeatletter
+\newenvironment{colorverb}{%
+  \parskip=\abovedisplayskip\par\noindent
+  \begingroup\small% small changes displayskips!
+%if color
+  \tabular{@@{}>{\columncolor{codecolor}}p{\linewidth}@@{}}%
+%elif framed
+  \framed
+%else
+  \tabular{@@{}||p{\linewidth-2\arraycolsep-2\arrayrulewidth-2pt}||@@{}}%
+  \hline \\[-1.5ex]
+  \let\myendofline=\\
+%endif
+  \let\\=\origlinebreak}{%
+%if not color && not framed
+  \myendofline[.5ex]\hline
+%endif
+%if framed
+  \endframed
+%else
+  \endtabular
+%endif
+  \endgroup
+  \parskip=\belowdisplayskip\par\noindent
+  \ignorespacesafterend}
+\makeatother
+\newenvironment{important}[1][Important]%
+  {\colorsurround
+   \centering
+   \bfseries\textsc{#1:}\ }%
+  {\endcolorsurround}
+
+%\definecolor{codecolor}{rgb}{.982, .902, .902}% original
+%\definecolor{codecolor}{rgb}{1,.898,.667}% so'n orange
+\definecolor{codecolor}{rgb}{1,1,.667}
+%format forall(a) = "\forall " a "\relax"
